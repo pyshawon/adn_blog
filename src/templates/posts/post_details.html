@@ -68,7 +68,7 @@
         {% endif %}
         
         <div class="comment_list">
-          {% for comment in post.get_letest_comments %}
+          {% for comment in post.get_comments %}
           <div class="comment">
             <p class="m-0" style="font-weight: bold;">{{ comment.get_user }}</p>
             <p class="m-0"><small style="font-style:italic;">Commented on {{ comment.timestamp|date:"Y-m-d h:i a"|upper }}</small></p>
