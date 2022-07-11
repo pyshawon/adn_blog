@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<!--Loop the posts-->
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="blog_posts">
+            {% for post in posts %}
+                <div class="card mb-3">
+                  <div class="card-body">
+                    <div class="single_post mb-2">
+                        <h2 class="mb-0"><a href="{{ post.get_absolute_url }}" style="text-decoration: none;">{{ post.title }}</a></h2>
+
+                        <p><small>Posted On {{ post.timestamp|date:"d-m-Y h:i a"|upper }} | Posted By {{ post.get_user }}</small> </p>
+
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid" style="width: 100%;">
+                        {% endif %}
+
+                        <div class="content mt-2">
+                            <p>{{ post.content|linebreaks }}</p>
+                        </div>
+
+                        <!-- Load 3 latest comment list -->
+                        <div class="comment_list">
+                        {% if post.get_letest_comments %}
+                          <h4>Comments</h4>
+                        {% endif %}
+                          {% for comment in post.get_letest_comments %}
+                          <div class="comment">
+                            <p class="m-0" style="font-weight: bold;">{{ comment.get_user }}</p>
+                            <p class="m-0"><small style="font-style:italic;">Commented on {{ comment.timestamp|date:"Y-m-d h:i a"|upper }}</small></p>
+                            <p class="m-0" style="font-style: italic;">{{ comment.content }}</p>
+                            {% if not forloop.last %}
+                                <hr style="margin: 15px 0px 15px 0px;" />
+                            {% endif %}
+                          </div>
+                          {% endfor %}
+                        </div>
+                        <!-- End load 3 latest comment list -->
+                    </div>
+
+                  </div>
+                </div>                
+            {% endfor %}
+        </div>
+        <!--End Loop the posts-->
+
+        <!--Pagination-->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-3">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+                <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+              </li>
+            {% endif %}
+
+            {% if page_obj.number|add:'-4' > 1 %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.number|add:'-5' }}">&hellip;</a></li>
+            {% endif %}
+
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="page-item active" aria-current="page">
+                  <span class="page-link">
+                    {{ i }}
+                  </span>
+                </li>
+                {% elif i > page_obj.number|add:'-5' and i < page_obj.number|add:'5' %}
+                     <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.paginator.num_pages > page_obj.number|add:'4' %}
+               <li class="page-item"><a class="page-link" href="?page={{ page_obj.number|add:'5' }}">&hellip;</a></li>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+                <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+        <!--end of Pagination-->
+    </div>
+</div>
+{% endblock %}

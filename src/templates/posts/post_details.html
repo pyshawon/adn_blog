@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="card mt-3">
+  <div class="card-body">
+
+  <div class="row">
+      <div class="col">
+        <h2 class="m-0">
+        {{ post.title }}
+        {% if request.user == post.user %}
+        <a href="{% url 'post_delete' post.id %}" style="float: right;">
+          <button class="btn btn-danger btn-sm">Delete Post</button>
+        </a>
+        {% endif %}
+        </h2>
+
+        <p><small>Posted On {{ post.timestamp|date:"d-m-Y h:i a"|upper }} | Posted By {{ post.get_user }}</small> </p>
+
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid" style="width: 100%;">
+        {% endif %}
+
+        <div class="content mt-2">
+            <p>{{ post.content|linebreaks }}</p>
+        </div>
+
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h5 class="mb-1 mt-2">{{ post.get_comments.count }} Comments</h5>
+        {% if request.user.is_authenticated %}
+        <div class="comment_create">
+            <center>
+                {% if comment_form.errors %}
+                    {% for field in comment_form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">
+                                <strong style="color: #f00">{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in comment_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <strong style="color: #f00">{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </center>
+            <form method="POST" action="">{% csrf_token %}
+              <div class="mb-2">
+                {% render_field comment_form.content class="form-control" rows="2" placeholder="Write your comment"  %}
+
+              </div>
+              <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+
+            </form>
+        </div>
+        {% else %}
+        <p>
+          Login to comment in this post
+        </p>
+        {% endif %}
+        
+        <div class="comment_list">
+          {% for comment in post.get_letest_comments %}
+          <div class="comment">
+            <p class="m-0" style="font-weight: bold;">{{ comment.get_user }}</p>
+            <p class="m-0"><small style="font-style:italic;">Commented on {{ comment.timestamp|date:"Y-m-d h:i a"|upper }}</small></p>
+            <p class="m-0" style="font-style: italic;">{{ comment.content }}</p>
+            {% if comment.user == request.user %}
+            <p>
+              <a href="{% url 'comment_delete' comment.id %}">
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </a>
+            </p>
+            {% endif %}
+            {% if not forloop.last %}
+                <hr style="margin: 15px 0px 15px 0px;" />
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+    </div>
+  </div>
+
+
+  </div>
+</div>
+
+
+
+{% endblock %}
